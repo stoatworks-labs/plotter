@@ -74,6 +74,7 @@
 #include <chrono>
 #include <cmath>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
 #include <fstream>
 #include <functional>
@@ -328,11 +329,32 @@ CGLContextObj createContext()
 		static_cast< CGLPixelFormatAttribute >( 0 )
 	};
 
+	//PLTEST_RENDERER=software asks for Apple's software renderer by id, on a
+	//Mac that has a GPU. It is what a GPU-less CI runner falls back to, so a
+	//check that fails only in CI can be reproduced here (wipe's recipe, by way
+	//of repousse). That renderer is not repeatable at the last bit.
+	const CGLPixelFormatAttribute generic[] = {
+		kCGLPFAOpenGLProfile, static_cast< CGLPixelFormatAttribute >( kCGLOGLPVersion_GL4_Core ),
+		kCGLPFARendererID, static_cast< CGLPixelFormatAttribute >( kCGLRendererGenericFloatID ),
+		kCGLPFAColorSize, static_cast< CGLPixelFormatAttribute >( 24 ),
+		kCGLPFAAlphaSize, static_cast< CGLPixelFormatAttribute >( 8 ),
+		static_cast< CGLPixelFormatAttribute >( 0 )
+	};
+
 	CGLPixelFormatObj format = nullptr;
 	GLint formatCount        = 0;
-	if( CGLChoosePixelFormat( accelerated, &format, &formatCount ) != kCGLNoError || format == nullptr )
+	const char* renderer     = std::getenv( "PLTEST_RENDERER" );
+	if( renderer != nullptr && std::strcmp( renderer, "software" ) == 0 )
+	{
+		if( CGLChoosePixelFormat( generic, &format, &formatCount ) != kCGLNoError || format == nullptr )
+			return nullptr;
+		std::fprintf( stderr, "pltest: PLTEST_RENDERER=software, Apple's software renderer\n" );
+	}
+	else if( CGLChoosePixelFormat( accelerated, &format, &formatCount ) != kCGLNoError || format == nullptr )
+	{
 		if( CGLChoosePixelFormat( software, &format, &formatCount ) != kCGLNoError || format == nullptr )
 			return nullptr;
+	}
 
 	CGLContextObj context = nullptr;
 	const CGLError error  = CGLCreateContext( format, nullptr, &context );

@@ -52,6 +52,8 @@ the sheet, or any check's tolerance.
 - Every check above FAILS on a perturbed plugin: `./build/pltest --negative`;
   one perturbation by hand: `./build/pltest --perturb BITS --ink` (bits in `Machine.h`)
 - Every GL check takes `--size WxH`; CI runs them at 320x180
+- CI's renderer, on this Mac: `PLTEST_RENDERER=software ./build/pltest --persist --size 320x180`
+  (Apple's software rasteriser; `verify.sh` runs every GL check on it)
 - No dead controls: `python3 tools/sweep.py` (`--size WxH`, `--jobs N`)
 - Render cost: `./build/pltest --bench` (720p, 1080p); `--bench-4k` adds 4K, once, by hand
 - What a host sees: `~/Projects/resolume/oxbow/build/oxbow probe build-universal/Plotter.bundle`

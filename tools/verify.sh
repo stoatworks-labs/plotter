@@ -192,6 +192,20 @@ else
 	printf '%s\n' "$out" | grep -E 'DEAD|changed nothing' | sed 's/^/      /'
 fi
 
+# CI's exact GPU commands again, on Apple's SOFTWARE renderer, which is what
+# GitHub's macOS runners have. It is not repeatable at the last bit (repousse's
+# resize check failed CI by one ulp), and this is where a check that asserts
+# exactness on this Mac's GPU is found before CI finds it.
+step "software renderer (CI's, at 320x180)"
+for check in trapezoid ink budget steps pens persist trace negative; do
+	if out=$( PLTEST_RENDERER=software "$PLTEST" --$check --size 320x180 2>&1 ); then
+		pass "pltest --$check (software): $( printf '%s\n' "$out" | grep -v '^$' | tail -1 )"
+	else
+		fail "pltest --$check on the software renderer -- run: PLTEST_RENDERER=software $PLTEST --$check --size 320x180"
+		printf '%s\n' "$out" | grep -v '^  t ' | sed 's/^/      /'
+	fi
+done
+
 step "bench: the render cost, for the record"
 "$PLTEST" --bench --frames 60 2>&1 | sed -n '5,7p' | sed 's/^/   /'
 

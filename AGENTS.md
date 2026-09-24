@@ -262,8 +262,11 @@ What might still differ on another rasteriser: the bilinear filter's sub-texel
 weights in the resample (the `--persist` tolerance allows 8 bits); `exp` and
 `tanh` within their stated ULPs; the 32F blend, which GL leaves to the
 implementation (a half-float blend path would show up as `--trapezoid`
-reading low, as it did here). The GL checks have never run on a software
-rasteriser: CI would run them there if its runner could make a 4.1 context.
+reading low, as it did here). Every GL check also runs on Apple's software
+rasteriser (`PLTEST_RENDERER=software`, the renderer GitHub's macOS runners
+fall back to, which is not repeatable at the last bit) at 320×180 in
+`verify.sh`: all eight pass there, `--persist`'s byte-for-byte included,
+because an idle machine deposits nothing and the paper is only read.
 
 ---
 
