@@ -151,9 +151,10 @@ fi
 # one at frame 2 (White) frame 1 must still be Alpha. A ramp would put frame 1
 # at 2, Ghost, which is opaque; Alpha paper is transparent where nothing is
 # inked, and on blank input nothing is. The alpha byte of frame 1's first
-# pixel tells them apart: 0 stepped, 255 ramped.
+# pixel tells them apart: 0 stepped, 255 ramped. The carriage is hidden: its
+# ring at the carousel feathers into that corner pixel at 36 rows.
 printf '0 Paper 4\n2 Paper 0\n' > "$cues"
-alpha=$( "$PLTEST" --pipe --size 64x36 --script "$cues" < "$raw" 2>/dev/null | tail -c +$(( frame + 4 )) | head -c 1 | od -An -tu1 | tr -d ' ' )
+alpha=$( "$PLTEST" --pipe --size 64x36 --set "Show Carriage=0" --script "$cues" < "$raw" 2>/dev/null | tail -c +$(( frame + 4 )) | head -c 1 | od -An -tu1 | tr -d ' ' )
 if [ "$alpha" = "0" ]; then
 	pass "an option cue steps: frame 1 between Alpha@0 and White@2 is still Alpha (alpha 0)"
 else
