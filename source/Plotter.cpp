@@ -445,7 +445,21 @@ FFResult Plotter::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 
 	//---------------------------------------------------------------------
 	// 3. Stabilise, ping-ponged against the previous frame's result.
+	//
+	//    A tear-off -- the event, or the timer -- is decided HERE, before the
+	//    filter runs, and drops the history: the new sheet's first job is
+	//    traced from the picture now, not from the previous picture's fading
+	//    edges in the previous picture's colours. Filming found Resolume's
+	//    three coloured rings drawn in a sphere's orange after a hard cut,
+	//    and in a mask's black after another: the colour rides the same slow
+	//    release as the gradient. The sheet itself is cleared in step 4.
 	//---------------------------------------------------------------------
+	sheetSeconds += frameSeconds;
+	const float autoSheet = AutoSheetFromParam( params[ PT_AUTO_SHEET ] );
+	if( autoSheet > 0.0f && sheetSeconds >= autoSheet )
+		newSheetPending = true;
+	if( newSheetPending )
+		historyValid = false;
 	{
 		const int history = stableCurrent;
 		const int target  = 1 - stableCurrent;
@@ -474,10 +488,6 @@ FFResult Plotter::ProcessOpenGL( ProcessOpenGLStruct* pGL )
 	const auto cpuStart = std::chrono::steady_clock::now();
 	tracedLastFrame     = false;
 
-	sheetSeconds += frameSeconds;
-	const float autoSheet = AutoSheetFromParam( params[ PT_AUTO_SHEET ] );
-	if( autoSheet > 0.0f && sheetSeconds >= autoSheet )
-		newSheetPending = true;
 	if( newSheetPending )
 	{
 		ink.Clear();

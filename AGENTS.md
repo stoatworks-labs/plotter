@@ -207,6 +207,29 @@ frame 1 is Alpha and transparent where uninked; ramped, it is Ghost. And the
 carriage has to be hidden, because at 36 rows its ring's 1.5 px feather reaches
 the corner pixel the test reads (alpha 164 on a "blank" sheet).
 
+### ☠️ The first job after a cut wore the previous clip's colours
+
+Filming found it: Resolume's three coloured rings, cut in after a sphere of
+orange shingles, were drawn in red, and after a grey mask in black. The
+colour along a stroke is read out of the stabilised trace buffer, and the
+temporal filter's slow release carries the previous picture's colour as well
+as its gradient, so a job traced on the frame of a tear-off was the old
+picture's edges in the old picture's colours. A tear-off (New Sheet, or the
+Auto Sheet timer) is now decided before the stabilise pass and drops the
+history, so the new sheet's first job is traced from the picture now. A hard
+cut without a tear-off still fades the old edges out over the release, which
+is the filter doing its job.
+
+### ☠️ Palette Source is a dark pen on a dark ground
+
+Also found filming. The stroke's colour is sampled where the edge is, at the
+trace mip level, so on a bright shape against black it is half background:
+Trinity's rings drew near-black under Source, and the Technical pens sent the
+same sample to the black pen by the grey rule. A survey of every bundled demo
+clip with eight pens found colour only where the edges lie inside colour
+(Metalive's shingles, the dancers' skin, Cyberspace's red lines). The guide
+says so; nothing was changed, because the sample is honest.
+
 ### ☠️ Mutation-test only a committed tree
 
 Both mutations were applied to a clean, committed tree and reverted with
