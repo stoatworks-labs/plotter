@@ -1,0 +1,197 @@
+name: release
+
+# Build the Plotter FFGL plugin for the two platforms Resolume runs on:
+#   - macOS   -> universal (arm64 + x86_64) Plotter.bundle
+#   - Windows -> x64 Plotter.dll (GLEW static-linked via vcpkg)
+# Each ships as a zip; drop the bundle/dll into Resolume's "Extra Effects"
+# folder. Trigger manually (Actions > release > Run workflow) or by pushing a
+# v* tag.
+#
+# Dispatching this manually is the cheap way to test an FFGL build without
+# publishing anything: the release job below is gated on refs/tags/v*, so a
+# workflow_dispatch run builds both platforms and skips publication. That is
+# also the only thing standing between "the code uses nothing platform-specific"
+# and actually knowing Windows compiles.
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # macos-14 and never macos-13: the Intel macOS runners are retired,
+          # so x86_64 is cross-compiled from Apple Silicon rather than built
+          # natively. CMAKE_OSX_ARCHITECTURES in CMakeLists.txt does that on
+          # its own; there is nothing to set here.
+          - { name: macos-universal, os: macos-14,       artifact: Plotter.bundle }
+          - { name: windows-x86_64,  os: windows-latest, artifact: Plotter.dll }
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          submodules: recursive
+
+      # --- macOS: no extra deps, universal build straight from CMake ---
+      # Tools off: pltest links against zlib and CGL and is a developer
+      # harness, not something that ships. The checks it runs happen locally
+      # via tools/verify.sh.
+      - name: Configure (macOS)
+        if: runner.os == 'macOS'
+        run: cmake -B build -DCMAKE_BUILD_TYPE=Release -DPLOTTER_BUILD_TOOLS=OFF
+
+      # --- Windows: GLEW comes from vcpkg, static-linked (static-md keeps the
+      #     CRT dynamic so the plugin matches the host) so the .dll has no
+      #     external glew32.dll runtime dependency. ---
+      - name: Configure (Windows)
+        if: runner.os == 'Windows'
+        run: >
+          cmake -B build -A x64
+          -DCMAKE_BUILD_TYPE=Release
+          -DPLOTTER_BUILD_TOOLS=OFF
+          -DVCPKG_TARGET_TRIPLET=x64-windows-static-md
+          -DCMAKE_TOOLCHAIN_FILE="$env:VCPKG_INSTALLATION_ROOT/scripts/buildsystems/vcpkg.cmake"
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Derive version
+        id: ver
+        shell: bash
+        run: |
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            echo "version=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=0.0.0-dev.${GITHUB_RUN_NUMBER}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Collect artifact
+        shell: bash
+        run: |
+          mkdir -p out
+          if [ "${{ runner.os }}" = "macOS" ]; then
+            cp -R "build/Plotter.bundle" "out/Plotter.bundle"
+            # Actions runs `shell: bash` as `bash -eo pipefail`, so
+            # `cmd | grep -q X` FAILS when grep FINDS its match: grep exits at
+            # once, the writer takes SIGPIPE, and pipefail reports the pipeline
+            # as failed -- failing the release on a correct binary. It is
+            # output-size dependent, so it bites the biggest artefact first.
+            # Captured and matched with `case` instead.
+            __archs=$( lipo -archs "out/Plotter.bundle/Contents/MacOS/Plotter" )
+            echo "architectures: $__archs"
+            case "$__archs" in
+              *x86_64*) ;;
+              *) echo "expected x86_64, got: $__archs"; exit 1 ;;
+            esac
+            case "$__archs" in
+              *arm64*) ;;
+              *) echo "expected arm64, got: $__archs"; exit 1 ;;
+            esac
+            __symbols=$( nm -gU "out/Plotter.bundle/Contents/MacOS/Plotter" )
+            case "$__symbols" in
+              *_plugMain*) ;;
+              *) echo "expected _plugMain -- the bundle would contain no plugins"; exit 1 ;;
+            esac
+          else
+            cp "build/Release/Plotter.dll" "out/Plotter.dll"
+          fi
+          ls -R out
+
+      - name: Archive (zip)
+        shell: bash
+        run: |
+          cd out
+          if command -v 7z >/dev/null 2>&1; then
+            7z a "../plotter-${{ matrix.name }}.zip" ./*
+          else
+            zip -r "../plotter-${{ matrix.name }}.zip" ./*
+          fi
+
+      - name: Disk image (macOS)
+        if: runner.os == 'macOS'
+        shell: bash
+        # A .dmg, but deliberately NOT a .pkg. An FFGL plugin's destination is
+        # per-user and edition-specific -- the README installs to
+        # ~/Documents/Resolume {Arena,Avenue}/Extra Effects -- so a .pkg would
+        # have to guess a path and would silently install to the wrong one for
+        # half of users.
+        run: |
+          source scripts/release-lib.sh
+          rl_init "Plotter" plotter "${{ steps.ver.outputs.version }}" \
+            com.stoatworks.plotter "$GITHUB_WORKSPACE"
+          cp README.md out/ 2>/dev/null || true
+          rl_adhoc_sign "out/Plotter.bundle"
+          rl_dmg "${{ matrix.name }}" out
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v7
+        with:
+          name: plotter-${{ matrix.name }}
+          path: |
+            *.zip
+            *.dmg
+          if-no-files-found: error
+
+  windows-installer:
+    name: Windows installer
+    needs: build
+    runs-on: ubuntu-latest
+    # makensis cross-compiles, so the installer is wrapped here from the zip the
+    # Windows job uploaded. Its directory page defaults to the common FFGL
+    # folder but stays editable, because Resolume reads plugins from a path the
+    # user chooses per edition.
+    steps:
+      - uses: actions/checkout@v7
+
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+
+      - name: Install NSIS
+        run: sudo apt-get update && sudo apt-get install -y nsis
+
+      - name: Build installer
+        shell: bash
+        run: |
+          source scripts/release-lib.sh
+          version="${GITHUB_REF_NAME#v}"
+          case "$version" in [0-9]*) ;; *) version="0.0.0" ;; esac
+          rl_init "Plotter" plotter "$version" com.stoatworks.plotter "$PWD/installers"
+          zip="$(find artifacts -name "plotter-windows-x86_64.zip" | head -1)"
+          if [ -z "$zip" ]; then echo "no Windows artefact, nothing to do"; exit 0; fi
+          stage="$RUNNER_TEMP/stage-win"
+          rm -rf "$stage"; mkdir -p "$stage"
+          unzip -q "$zip" -d "$stage"
+          cp README.md "$stage/" 2>/dev/null || true
+          # --plain: a plugin needs neither a shortcut nor a PATH entry. It was
+          # --cli until nib#2, where the unguarded PATH write wiped a system PATH.
+          rl_nsis windows-x86_64 "$stage" --plain
+          ls -l installers
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: plotter-windows-installer
+          path: installers/*
+          if-no-files-found: warn
+
+  release:
+    name: Publish release
+    needs: [build, windows-installer]
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v8
+        with:
+          path: artifacts
+      - uses: softprops/action-gh-release@v3
+        with:
+          files: artifacts/**/*
+          generate_release_notes: true
