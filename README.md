@@ -24,6 +24,42 @@ the ink stays on. By the time it is a few strokes in, the clip has moved on.
 `pltest`, the offline harness. The corners are heavier than the sides and
 every stroke starts and ends with a blot — neither is drawn.</sub>
 
+<!-- downloads:start -->
+
+## Download
+
+**[v0.1.0](https://github.com/stoatworks-labs/plotter/releases/tag/v0.1.0)** — prebuilt for macOS and Windows. Pick your platform:
+
+<details>
+<summary><b>macOS</b> — Universal (Apple Silicon + Intel)</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| Universal (Apple Silicon + Intel) · .dmg disk image | [`plotter-0.1.0-macos-universal.dmg`](https://github.com/stoatworks-labs/plotter/releases/download/v0.1.0/plotter-0.1.0-macos-universal.dmg) | 484 KB |
+| Universal (Apple Silicon + Intel) · .zip archive | [`plotter-macos-universal.zip`](https://github.com/stoatworks-labs/plotter/releases/latest/download/plotter-macos-universal.zip) | 201 KB |
+
+</details>
+
+<details>
+<summary><b>Windows</b> — x64</summary>
+
+| Build | Download | Size |
+| --- | --- | --- |
+| x64 · .exe installer | [`plotter-0.1.0-windows-x86_64-setup.exe`](https://github.com/stoatworks-labs/plotter/releases/download/v0.1.0/plotter-0.1.0-windows-x86_64-setup.exe) | 238 KB |
+| x64 · .zip archive | [`plotter-windows-x86_64.zip`](https://github.com/stoatworks-labs/plotter/releases/latest/download/plotter-windows-x86_64.zip) | 133 KB |
+
+</details>
+
+All builds, checksums and release notes: [github.com/stoatworks-labs/plotter/releases](https://github.com/stoatworks-labs/plotter/releases).
+
+The Windows builds are unsigned, so SmartScreen warns once.
+
+<!-- downloads:end -->
+
+## Video
+
+[![Plotter: a pen plotter drawing the clip, for Resolume](docs/video-thumb.png)](https://www.youtube.com/watch?v=5esaT1kuNX4)
+
 ## The one idea
 
 [galvo](https://github.com/stoatworks-labs/galvo) is a laser: a fast mirror
