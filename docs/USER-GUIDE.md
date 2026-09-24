@@ -51,7 +51,7 @@ Avenue uses the same layout under its own folder name. The effect then appears i
 browser as **SW Plotter**.
 
 The macOS download is a universal build (Apple silicon and Intel), as a `.dmg` or a `.zip`.
-It is **Developer ID-signed and notarised**, so the bundle simply loads. The Windows download is an x64 installer or a `.zip`. It is not code-signed, so the
+It is Developer ID-signed and notarised by the release pipeline **after** publication; a download made before that trips Gatekeeper once (right-click → Open), so if macOS refuses it, download it again. The Windows download is an x64 installer or a `.zip`. It is not code-signed, so the
 installer trips SmartScreen once: **More info** → **Run anyway**.
 
 ---
