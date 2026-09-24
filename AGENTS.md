@@ -100,6 +100,7 @@ The pipeline:
 | `tools/sweep.py` | No control is silently dead. |
 | `tools/check-shaders.sh` | glslc over the dumped shaders, and a reserved-word grep. |
 | `tools/verify.sh` | All of it, at two rasters, plus the release-time checks done locally. |
+| `demo/` | The browser demo: `plugin.js` holds every shader piece verbatim and a PORT of the CPU half; `tools/check_shaders.py` keeps the pieces identical; `vendor/` is the shared kit from `stoatworks-backend/resolume-demo` (never edit it, re-run `sync.sh`). Served by this repo's own Worker at `plotter-demo.stoatworks-labs.com` through a DNS record + route. |
 
 ---
 
@@ -306,6 +307,45 @@ above). Recorded because a mutation that cannot be seen says something about
 the tolerances, not about the harness.
 
 ---
+
+## The browser demo
+
+`demo/` is the page at **plotter-demo.stoatworks-labs.com**, built on galvo's
+`beed479` (the tracer is galvo's, so its JS port of the tracer is the start).
+Like galvo's it is the hard case in that suite: **this plugin is not a
+shader.** Between the detect passes and the ink renderer sit `Tracer`,
+`Planner`, `Machine`, `Controls` and the CPU side of `render/Ink`, and without
+them the page renders blank paper. So all of them are ported into
+`demo/plugin.js`, in JavaScript, function for function, and that port is the
+demo's weak point: `check_shaders.py` proves the nine GLSL pieces are the
+plugin's (the ink pass is assembled from three of them, here as there), and
+**nothing at all proves the port is**. Change one of those files and change
+the page by hand to match. The page says this in its banner and in its
+disclosure; do not soften either.
+
+What the page does that the plugin does not, each forced by WebGL2 and each
+disclosed on the page:
+
+- **The paper is RGBA32F only where the browser allows it.** WebGL2 blends
+  into a 32F target only with `EXT_float_blend` and filters one linearly only
+  with `OES_texture_float_linear`; without both the paper is RGBA16F, which is
+  the half-float bias the trap above measured and rejected, and the line under
+  the canvas says so. Without `EXT_color_buffer_float` the page refuses to
+  start rather than accumulate ink into eight bits.
+- **The stabilise buffers are RGBA8**, because WebGL2 will not read a float
+  framebuffer back as bytes and the readback is bytes in the plugin too.
+- **Pens is a dropdown** (no integer control in the kit) and **New Sheet is a
+  button** inserted at its declared position (no event control in the kit).
+- **The clock is the kit's**: seconds declared, so the unit vote never runs.
+  Restart restarts the clip, not the sheet.
+- The `Perturb` hooks, `SetJobForTest` and `ReadPaperForTest` are not ported.
+
+Deploy: `cf-run npx wrangler deploy` from the repo root, or push to main
+(`.github/workflows/deploy.yml`). The host is a Worker **route** over a
+proxied `AAAA 100::` DNS record, not a custom domain: the zone hit
+Cloudflare's 100-custom-domain limit on 2026-09-24. Delete that record and
+the page goes dark while deploys stay green. Verify by content:
+`curl -s 'https://plotter-demo.stoatworks-labs.com/?cb=1' | grep -o '<title>[^<]*'`.
 
 ## Decisions taken without asking
 

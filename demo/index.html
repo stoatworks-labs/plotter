@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Plotter — browser demo | Stoatworks Labs</title>
+    <meta name="description" content="Try the Plotter FFGL plugin for Resolume in your browser: a pen plotter drawing the clip with a slow pen onto paper the ink stays on. The plugin's own edge, ink and composite shaders ported to WebGL2, with its contour tracer, motion planner and machine ported to JavaScript." />
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="./vendor/kit.css" />
+    <link rel="canonical" href="https://plotter-demo.stoatworks-labs.com/" />
+  </head>
+  <body>
+    <main id="demo">
+      <noscript>
+        <p>
+          This demo runs the plugin's shaders in your browser, so it needs
+          JavaScript and WebGL2. The plugin itself, its source and its downloads
+          are on
+          <a href="https://github.com/stoatworks-labs/plotter">its repository</a>.
+        </p>
+      </noscript>
+    </main>
+
+    <script type="module" src="./plugin.js"></script>
+    <script
+      src="./vendor/support-footer.js"
+      defer
+      data-app="Plotter"
+      data-repo="https://github.com/stoatworks-labs/plotter"
+      data-note="A browser demo of the plugin's shaders and a port of its tracer, planner and machine. Nothing you load here leaves your machine."
+    ></script>
+  </body>
+</html>

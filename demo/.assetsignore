@@ -1,0 +1,4 @@
+# Not part of the page. check_shaders.py is a repo-side check that the demo's
+# shader copies still match the plugin's; wrangler would otherwise upload it and
+# serve it, which is neither useful nor anybody's business.
+tools/

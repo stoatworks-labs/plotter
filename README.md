@@ -104,6 +104,20 @@ port, no browser demo, no user guide, no factory presets. See
 [AGENTS.md](AGENTS.md) for what is assumed rather than measured, the traps,
 and the open questions.
 
+## Browser demo
+
+[plotter-demo.stoatworks-labs.com](https://plotter-demo.stoatworks-labs.com/)
+runs the plugin's own shaders in WebGL2 — the detect chain, the ink pass
+assembled from the same three pieces, the composite — copied across unedited
+and checked character for character by `demo/tools/check_shaders.py` from
+`tools/verify.sh`. Its CPU half — galvo's tracer, the planner, the machine
+advancing by real elapsed time, the paper's bookkeeping — is a **hand port to
+JavaScript**, and nothing checks a port but a reader. The page says so in its
+banner and lists every other gap (RGBA8 stabilise buffers, a 16F paper where
+the browser has no `EXT_float_blend`, Pens as a dropdown, New Sheet as a
+button) in its disclosure. It is served from `demo/` by this repo's own
+Worker and redeploys on every push to main.
+
 ## Build
 
     git clone --recursive https://github.com/stoatworks-labs/plotter

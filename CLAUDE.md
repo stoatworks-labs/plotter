@@ -38,6 +38,8 @@ the sheet, or any check's tolerance.
 - Everything: `tools/verify.sh` (fresh universal build + shaders + the no-GL
   checks + every GL check at 320x180 AND 1280x720 + the negative controls +
   `--pipe` + the sweep + a bench + the bundle + oxbow, ~3 min)
+- The browser demo's shaders are still the plugin's: `python3 demo/tools/check_shaders.py`
+  (in verify.sh). The demo's CPU half (`demo/plugin.js`) is a hand port; only a reader checks it.
 - The shaders alone: `tools/check-shaders.sh build/pltest` (compiles with
   glslc if installed; always greps for GLSL 4.10 reserved words)
 - No name over 16 characters, none twice: `./build/pltest --names`
@@ -104,6 +106,16 @@ the sheet, or any check's tolerance.
 - No OpenFX port, no browser demo, no factory presets, no user guide.
 - `StoatworksAbout.h` and `ATTRIBUTIONS.md` are provisional hand copies with
   `guide=""`; register the project and re-run the syncs before a release.
+
+## Browser demo
+
+`demo/` is the page at **plotter-demo.stoatworks-labs.com**, deployed from
+`wrangler.toml` (a Worker route over a proxied DNS record, not a custom domain)
+with `cf-run npx wrangler deploy` or by any push to main — no build step; what
+is committed is what is served. `demo/vendor/` is copied in by
+`~/Projects/infrastructure/stoatworks-backend/resolume-demo/sync.sh plotter`
+and is not a place to edit. Verify a deploy **by content, never by status
+code**: `curl -s 'https://plotter-demo.stoatworks-labs.com/?cb=1' | grep -o '<title>[^<]*'`.
 
 ## Diagnostics
 

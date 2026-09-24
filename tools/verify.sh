@@ -19,6 +19,9 @@
 #               ink pass that is assembled at run time -- and does none of
 #               them use a GLSL 4.10 reserved word (`packed` compiles here and
 #               not on Mesa)
+#   demo        the browser demo's copies of those shaders are still the
+#               plugin's, character for character (demo/tools/check_shaders.py);
+#               its PORT of the CPU half is checked by nobody but a reader
 #   offline     --names   nothing the host will silently truncate, no name twice
 #               --plan    the planner against its closed forms, the machine's
 #                         clock and grid, the pen sorting, the pen choice
@@ -90,6 +93,26 @@ elif [ $? -eq 3 ]; then
 else
 	fail "a shader does not compile, or uses a reserved word"
 	printf '%s\n' "$out" | sed 's/^/      /'
+fi
+
+#---------------------------------------------------------------------------
+# The browser demo's copy of the same GLSL.
+#
+# `demo/plugin.js` cannot include a C++ file, so it carries its own copy of
+# every shader piece, and two copies drift. check_shaders.py compares them
+# character for character. It says nothing about the demo's PORT of the CPU
+# half (the tracer, the planner, the machine); only a reader checks that.
+#---------------------------------------------------------------------------
+step "demo: the browser copy of the shaders"
+if [ -f demo/tools/check_shaders.py ]; then
+	if python3 demo/tools/check_shaders.py >/tmp/plotter-demo-shaders.log 2>&1; then
+		pass "$( tail -1 /tmp/plotter-demo-shaders.log )"
+	else
+		fail "the demo's shaders have drifted -- see /tmp/plotter-demo-shaders.log"
+		tail -12 /tmp/plotter-demo-shaders.log
+	fi
+else
+	printf '   skipped: no demo/\n'
 fi
 
 step "offline (no GL)"
