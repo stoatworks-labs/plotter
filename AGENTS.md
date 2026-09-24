@@ -10,8 +10,9 @@ before you tell anybody this works.
 
 A pen plotter drawing the clip, as an FFGL 2.1 effect (`PL01`, shown as
 `SW Plotter`) for Resolume Arena and Avenue. C++17 + GLSL 4.10, CMake,
-universal macOS `.bundle` and a Windows `.dll`. MIT, intended home
-`github.com/stoatworks-labs/plotter`.
+universal macOS `.bundle` and a Windows `.dll`. MIT, home
+`github.com/stoatworks-labs/plotter`, released at v0.1.0 on 2026-09-24 with a
+user guide, a browser demo and a project video.
 
 Built 2026-09-24 in one session from the fleet's templates and
 `specs/SPEC-plotter.md` with `BRIEF.md` and `BRIEF-ADDENDUM.md`: **galvo** for
@@ -405,12 +406,12 @@ the page goes dark while deploys stay green. Verify by content:
 - **Trace Size is fixed at 320**, galvo's default; Min Length 8 and Simplify
   1.15 trace pixels are constants. The spec's Path group is Threshold, Detail,
   Chase.
-- **No factory presets, no OpenFX, no browser demo** (not required for 0.1.0).
+- **No factory presets, no OpenFX.** The browser demo (`demo/`) came with the release.
 - **Test hooks live in the shipped plugin** (`Perturb` bits, `SetJobForTest`,
   `ReadPaperForTest`), always inert.
-- **`StoatworksAbout.h`, `StoatworksAboutLinks.h`, `StoatworksAboutParams.h` and
-  `ATTRIBUTIONS.md` are provisional hand copies**, adapted from galvo's, with
-  `guide=""`: register the project and re-run the syncs before the first release.
+- **`StoatworksAbout.h` and `ATTRIBUTIONS.md` are generated** by the backend's
+  `sync-about.py` and `sync-attributions.py`; the user guide is `docs/USER-GUIDE.md`,
+  rendered to the site and `docs/USER-GUIDE.pdf` by the website's `build_guides.py`.
 
 ---
 
@@ -470,12 +471,17 @@ Release build, at 320×180 and 1280×720.
 
 ### Assumed, or not done
 
-- ☠️ **Never loaded into Resolume**, on either platform. Everything was compiled,
+- ☠️ **Never loaded into Resolume on macOS.** Everything there was compiled,
   rendered and measured offline against the real plugin class in a headless
   CGL context, plus an `oxbow` load.
-- **Seen on footage only as stills.** Four demo clips, three stills each. No
-  reel has been watched; whether the pace reads right at 60 fps in a host is
-  a judgement nobody has made.
+- **Windows:** On Windows, in Resolume Arena 7.27.1 (win-lab, Mesa llvmpipe, no GPU, 2026-09-24), the DLL of this source loads from Extra Effects, registers as `SW Plotter` / `PL01` / effect, all 25 host controls match the declaration, it renders, Arena's log stays clean and all 19 controls move the picture: 9 of the fleet gate's 9 checks, in two runs (before and after the tear-off fix). Software rendering says nothing about a GPU or about speed.
+- **Seen on footage only through `--pipe`** (a survey of every bundled demo clip
+  at the defaults, then the project video at 30 fps). The pace reads right at 30 fps
+  on a render; whether it does at 60 fps in a host is a judgement nobody has made.
+  Filming found that **Palette Source is a dark pen on a dark ground**: the stroke's
+  colour is sampled at the edge, half background, and the Technical pens' nearest-pen
+  rule sends that sample to black too (Resolume's three coloured rings drew black under
+  both). A clip whose edges lie inside colour (the dancers) draws in colour.
 - **The clock-unit voting** is galvo's, which has met Arena on Windows; this
   plugin has not.
 - **The 1/v law inside a sample interval** is held to 1% of v by sub-sampling;
@@ -483,10 +489,9 @@ Release build, at 320×180 and 1280×720.
   (`--plan` measures its timing).
 - **The tracer's cost on footage** is not measured: `--bench` traces the test
   card (eight strokes). A busy frame of footage has hundreds.
-- **Windows** has not been built here; the release workflow is galvo's with
-  the names changed and has not run.
-- **No OpenFX port, no browser demo, no user guide.** Not required for 0.1.0.
-- **The provisional About headers and ATTRIBUTIONS** are hand copies (above).
+- **Windows** builds in CI (MSVC, GLEW from vcpkg); see the Arena line above.
+- **No OpenFX port.** The browser demo is a port to a web page; its CPU half is a
+  hand port that only a reader checks (see `demo/`).
 - **Nothing has been through a show.**
 
 ---

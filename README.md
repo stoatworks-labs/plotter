@@ -8,7 +8,8 @@
 > after t seconds against the planned schedule, a staircase against the step
 > pitch, pen changes against the pen count, and the sheet through a resize
 > — and every one of those checks is proved to fail on a deliberately broken
-> plugin (see [Status](#status)). It has **never been loaded into Resolume**.
+> plugin (see [Status](#status)). It has **never been loaded into Resolume on
+> macOS**; on Windows it has run in Resolume Arena 7.27.1, on software rendering.
 > Check it in your own rig before trusting it in front of an audience.
 
 A pen plotter drawing the clip, as an FFGL effect for [Resolume](https://resolume.com)
@@ -98,11 +99,15 @@ tolerance is derived and written down in [AGENTS.md](AGENTS.md).
 | Binary | universal (`x86_64 arm64`), exports `plugMain`, ad-hoc signs |
 | Render cost | **0.19–0.21 / 0.20–0.22 / 0.53 ms** a frame at 720p / 1080p / 4K as shipped (the tracer runs once a job); **0.73–1.69 / 0.77–2.05 / 1.15 ms** with a trace forced every frame, of which the tracer — readback, trace, plan — is 0.59–1.44 / 0.64–1.72 / 0.98 ms. Ranges over two runs on a shared GPU: the readback stall is what moves |
 
-**Not yet done:** never loaded into Resolume, on any platform. Seen on
-Resolume's own demo clips only as stills through `pltest --pipe`. No OpenFX
-port, no browser demo, no user guide, no factory presets. See
-[AGENTS.md](AGENTS.md) for what is assumed rather than measured, the traps,
-and the open questions.
+**Not yet done:** never loaded into Resolume on macOS. On Windows, in Resolume Arena 7.27.1 (win-lab, Mesa llvmpipe, no GPU, 2026-09-24), the DLL of this source loads from Extra Effects, registers as `SW Plotter` / `PL01` / effect, all 25 host controls match the declaration, it renders, Arena's log stays clean and all 19 controls move the picture: 9 of the fleet gate's 9 checks, in two runs (before and after the tear-off fix). Software rendering says nothing about a GPU or about speed.
+Footage has been seen through `pltest --pipe` only (the project video, on
+Resolume's bundled demo clips): on a dark ground the Source palette is a dark
+pen, because the stroke's colour is sampled at the edge, against the
+background. No OpenFX port, no factory presets. There is a
+[user guide](https://stoatworks-labs.com/software/plotter/guide/) and a
+[browser demo](https://plotter-demo.stoatworks-labs.com/), which is a port to a web page and
+not the plugin. See [AGENTS.md](AGENTS.md) for what is assumed rather than
+measured, the traps, and the open questions.
 
 ## Browser demo
 
