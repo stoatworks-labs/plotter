@@ -35,8 +35,8 @@ every stroke starts and ends with a blot — neither is drawn.</sub>
 
 | Build | Download | Size |
 | --- | --- | --- |
-| Universal (Apple Silicon + Intel) · .dmg disk image | [`plotter-0.1.0-macos-universal.dmg`](https://github.com/stoatworks-labs/plotter/releases/download/v0.1.0/plotter-0.1.0-macos-universal.dmg) | 484 KB |
-| Universal (Apple Silicon + Intel) · .zip archive | [`plotter-macos-universal.zip`](https://github.com/stoatworks-labs/plotter/releases/latest/download/plotter-macos-universal.zip) | 201 KB |
+| Universal (Apple Silicon + Intel) · .dmg disk image | [`plotter-0.1.0-macos-universal.dmg`](https://github.com/stoatworks-labs/plotter/releases/download/v0.1.0/plotter-0.1.0-macos-universal.dmg) | 258 KB |
+| Universal (Apple Silicon + Intel) · .zip archive | [`plotter-macos-universal.zip`](https://github.com/stoatworks-labs/plotter/releases/latest/download/plotter-macos-universal.zip) | 218 KB |
 
 </details>
 
@@ -52,7 +52,7 @@ every stroke starts and ends with a blot — neither is drawn.</sub>
 
 All builds, checksums and release notes: [github.com/stoatworks-labs/plotter/releases](https://github.com/stoatworks-labs/plotter/releases).
 
-The Windows builds are unsigned, so SmartScreen warns once.
+macOS builds are signed and notarised and open normally. The Windows builds are unsigned, so SmartScreen warns once.
 
 <!-- downloads:end -->
 
