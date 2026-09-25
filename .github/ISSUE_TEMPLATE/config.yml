@@ -3,13 +3,13 @@
 blank_issues_enabled: true
 contact_links:
   - name: Report a problem without a GitHub account
-    url: https://stoatworks-labs.com/feedback?project=galvo
+    url: https://stoatworks-labs.com/feedback?project=plotter
     about: >
       The same bug, feature and field-report forms on the website. No account needed —
       it reaches the same place.
 
   - name: Ask a question or show what you built
-    url: https://github.com/stoatworks-labs/galvo/discussions
+    url: https://github.com/stoatworks-labs/plotter/discussions
     about: For anything that isn't a defect — questions, setups, ideas in progress.
 
 
@@ -20,7 +20,7 @@ contact_links:
   # they have disclosed responsibly and starts their clock. This form needs no mail
   # infrastructure and is private by construction.
   - name: Report a security vulnerability privately
-    url: https://github.com/stoatworks-labs/galvo/security/advisories/new
+    url: https://github.com/stoatworks-labs/plotter/security/advisories/new
     about: >
       Please don't open a public issue for a vulnerability. This form is private and
       goes straight to the maintainer.
