@@ -1,28 +1,26 @@
 # plotter
 
 > **AI-assisted project.** This codebase was created with [Claude](https://claude.com/claude-code)
-> (Anthropic), directed and reviewed by a human author. The machine is
-> verified numerically by an offline harness that drives the real plugin
-> class on a synthetic clock: a stroke's timing against the trapezoid's
-> closed form, the ink along it against 1/speed, the strokes on the sheet
-> after t seconds against the planned schedule, a staircase against the step
-> pitch, pen changes against the pen count, and the sheet through a resize
-> — and every one of those checks is proved to fail on a deliberately broken
-> plugin (see [Status](#status)). It has **never been loaded into Resolume on
-> macOS**; on Windows it has run in Resolume Arena 7.27.1, on software rendering.
-> Check it in your own rig before trusting it in front of an audience.
+> (Anthropic), directed and reviewed by a human author. An offline harness drives the real
+> plugin class on a synthetic clock and checks the machine by the numbers: a stroke's timing
+> against the trapezoid's closed form, the ink along it against 1/speed, the strokes on the
+> sheet after t seconds against the planned schedule, a staircase against the step pitch, pen
+> changes against the pen count, and the sheet through a resize. Every one of those checks is
+> proved to fail on a plugin broken on purpose (see [Status](#status)). It's **never been
+> loaded into Resolume on macOS**; on Windows it's run in Resolume Arena 7.27.1, on software
+> rendering. Check it in your own rig before you trust it in front of an audience.
 
 A pen plotter drawing the clip, as an FFGL effect for [Resolume](https://resolume.com)
 Arena and Avenue. It traces the outlines in the current frame and draws
-them with a slow pen — a speed limit, an acceleration limit, a lift and a
-drop between strokes, a trip to the carousel to change colour — onto paper
-the ink stays on. By the time it is a few strokes in, the clip has moved on.
+them with a slow pen (a speed limit, an acceleration limit, a lift and a
+drop between strokes, a trip to the carousel to change colour) onto paper
+the ink stays on. By the time it's a few strokes in, the clip has moved on.
 
 ![The test card drawn by the plotter: a red square with heavy corners, a black octagon, three black dashes, and the pen carriage parked top left](docs/hero.png)
 
 <sub>The repo's test card after twelve seconds at the defaults, rendered by
 `pltest`, the offline harness. The corners are heavier than the sides and
-every stroke starts and ends with a blot — neither is drawn.</sub>
+every stroke starts and ends with a blot. Neither is drawn on: it's what the pen does.</sub>
 
 <!-- downloads:start -->
 
@@ -64,7 +62,7 @@ macOS builds are signed and notarised and open normally. The Windows builds are 
 
 [galvo](https://github.com/stoatworks-labs/galvo) is a laser: a fast mirror
 redrawing the whole path every frame. A plotter is **the opposite machine.
-It is slow**, and the ink stays.
+It's slow**, and the ink stays.
 
 Everything anybody recognises about a plotter drawing falls out of that:
 
@@ -73,11 +71,11 @@ Everything anybody recognises about a plotter drawing falls out of that:
   sheet is a collage of the moments at which each stroke was drawn. `Chase`
   re-traces at the end of every stroke, so the next one always comes from now.
 - **Ink weight follows speed.** The pen deposits ink per unit of *time*, so the
-  line is heavy where the pen is slow — the ends of every stroke, every
-  corner — and thin on the straights. Turn `Max Speed` down and the whole
+  line is heavy where the pen is slow (the ends of every stroke, every
+  corner) and thin on the straights. Turn `Max Speed` down and the whole
   drawing darkens; turn `Acceleration` down and the heavy ends grow.
 - **A blot at every pen-down.** `Pen Settle` is how long the pen rests on the
-  paper before it moves and after it stops. It is a dot of ink, and it is why
+  paper before it moves and after it stops. It's a dot of ink, and it's why
   a plotter drawing is dotted at every vertex the pen lifted at.
 - **Stair-stepping.** Two stepper motors can only stop on a grid. Wind `Step
   Size` up and a shallow diagonal is drawn as runs and risers, exactly `k`
@@ -86,36 +84,36 @@ Everything anybody recognises about a plotter drawing falls out of that:
   strokes by pen the way real plotter drivers did (`Optimise`), and every
   change is a trip off the corner of the sheet and a wait.
 
-None of it is drawn. There is a trapezoidal motion planner, a machine that
+None of it is drawn on. There's a trapezoidal motion planner, a machine that
 advances by the time that really passed, and a renderer that spreads each
 interval's ink over the distance the carriage covered in it. The blots, the
 heavy corners and the staircases are what those three do.
 
 ## Controls
 
-- **Machine** — `Max Speed` (0.05–2 sheet heights a second), `Acceleration`,
+- **Machine:** `Max Speed` (0.05–2 sheet heights a second), `Acceleration`,
   `Pen Settle` (the blot), `Step Size` (off, then a stepper pitch from half a
   pixel to a staircase), `Corner Angle` (a turn this sharp is a full stop; a
   gentler one is taken slower in proportion).
-- **Pens** — `Pens` (1–8 on the carousel), `Pen Width`, `Flow` (the darkness
+- **Pens:** `Pens` (1–8 on the carousel), `Pen Width`, `Flow` (the darkness
   at the reference speed, whatever the width), `Palette` (Technical, Black,
-  Neon, or Source — the stroke's own colour sorted onto the technical pens),
+  Neon, or Source, which is the stroke's own colour sorted onto the technical pens),
   `Optimise` (sort by pen, then nearest start).
-- **Path** — `Threshold` and `Detail`, galvo's tracer controls with galvo's
+- **Path:** `Threshold` and `Detail`, galvo's tracer controls with galvo's
   names; `Chase`.
-- **Sheet** — `Auto Sheet` (tear off after N seconds; 0 never), `New Sheet`
-  (tear off now), `Paper` (White, Cream, Ghost — the clip faintly under the
+- **Sheet:** `Auto Sheet` (tear off after N seconds; 0 never), `New Sheet`
+  (tear off now), `Paper` (White, Cream, Ghost for the clip faintly under the
   sheet, Clip, or Alpha for the layer below), `Show Carriage`, `Show Travel`
   (pen-up moves as a faint pencil line), `Mix`.
 
 The tracer is galvo's, copied rather than rewritten: it thins a thresholded
 edge mask and walks it. On logos and line art it finds long clean strokes;
-on footage it finds a mess of short ones, which is the honest result of
-pointing a plotter at video and is the look.
+on footage it finds a mess of short ones. That's what you get for pointing
+a plotter at video, and it's the look.
 
 ## Status
 
-**v0.1.0, and honestly early.** Verified by measurement on an M4 Max,
+**v0.1.0, and still early days.** Verified by measurement on an M4 Max,
 macOS 26.4, 2026-09-24. Every check runs at 320×180 and 1280×720; every
 tolerance is derived and written down in [AGENTS.md](AGENTS.md).
 
@@ -135,28 +133,28 @@ tolerance is derived and written down in [AGENTS.md](AGENTS.md).
 | Binary | universal (`x86_64 arm64`), exports `plugMain`, ad-hoc signs |
 | Render cost | **0.19–0.21 / 0.20–0.22 / 0.53 ms** a frame at 720p / 1080p / 4K as shipped (the tracer runs once a job); **0.73–1.69 / 0.77–2.05 / 1.15 ms** with a trace forced every frame, of which the tracer — readback, trace, plan — is 0.59–1.44 / 0.64–1.72 / 0.98 ms. Ranges over two runs on a shared GPU: the readback stall is what moves |
 
-**Not yet done:** never loaded into Resolume on macOS. On Windows, in Resolume Arena 7.27.1 (win-lab, Mesa llvmpipe, no GPU, 2026-09-24), the DLL of this source loads from Extra Effects, registers as `SW Plotter` / `PL01` / effect, all 25 host controls match the declaration, it renders, Arena's log stays clean and all 19 controls move the picture: 9 of the fleet gate's 9 checks, in two runs (before and after the tear-off fix). Software rendering says nothing about a GPU or about speed.
-Footage has been seen through `pltest --pipe` only (the project video, on
+**Not yet done:** it's never been loaded into Resolume on macOS. On Windows, in Resolume Arena 7.27.1 (win-lab, Mesa llvmpipe, no GPU, 2026-09-24), the DLL of this source loads from Extra Effects, registers as `SW Plotter` / `PL01` / effect, all 25 host controls match the declaration, it renders, Arena's log stays clean and all 19 controls move the picture: 9 of the fleet gate's 9 checks, in two runs (before and after the tear-off fix). Software rendering says nothing about a GPU or about speed.
+Footage has only been seen through `pltest --pipe` (the project video, on
 Resolume's bundled demo clips): on a dark ground the Source palette is a dark
 pen, because the stroke's colour is sampled at the edge, against the
-background. No OpenFX port, no factory presets. There is a
+background. No OpenFX port, no factory presets. There's a
 [user guide](https://stoatworks-labs.com/software/plotter/guide/) and a
-[browser demo](https://plotter-demo.stoatworks-labs.com/), which is a port to a web page and
-not the plugin. See [AGENTS.md](AGENTS.md) for what is assumed rather than
+[browser demo](https://plotter-demo.stoatworks-labs.com/), which is a port to a web page rather
+than the plugin. See [AGENTS.md](AGENTS.md) for what's assumed rather than
 measured, the traps, and the open questions.
 
 ## Browser demo
 
 [plotter-demo.stoatworks-labs.com](https://plotter-demo.stoatworks-labs.com/)
-runs the plugin's own shaders in WebGL2 — the detect chain, the ink pass
-assembled from the same three pieces, the composite — copied across unedited
+runs the plugin's own shaders in WebGL2 (the detect chain, the ink pass
+assembled from the same three pieces, the composite), copied across unedited
 and checked character for character by `demo/tools/check_shaders.py` from
-`tools/verify.sh`. Its CPU half — galvo's tracer, the planner, the machine
-advancing by real elapsed time, the paper's bookkeeping — is a **hand port to
-JavaScript**, and nothing checks a port but a reader. The page says so in its
+`tools/verify.sh`. Its CPU half (galvo's tracer, the planner, the machine
+advancing by real elapsed time, the paper's bookkeeping) is a **hand port to
+JavaScript**, and nothing checks a port except somebody reading it. The page says so in its
 banner and lists every other gap (RGBA8 stabilise buffers, a 16F paper where
 the browser has no `EXT_float_blend`, Pens as a dropdown, New Sheet as a
-button) in its disclosure. It is served from `demo/` by this repo's own
+button) in its disclosure. It's served from `demo/` by this repo's own
 Worker and redeploys on every push to main.
 
 ## Build
