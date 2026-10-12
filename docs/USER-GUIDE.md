@@ -334,7 +334,7 @@ buffer that couldn't be allocated.
   of a job; on a very busy clip with Chase on it runs once a stroke.
 - **Footage has been seen by eye only**, through the harness's `--pipe`, on Resolume's bundled
   demo clips (the project video). Nothing on footage is measured.
-- **Only ever run on an Apple M4 Max**, although the macOS build contains an Intel slice.
+- **On a Mac, only ever run on an Apple M4 Max**, although the macOS build contains an Intel slice.
 - **No presets, no audio input** and no OpenFX version.
 - **There's a browser demo** at [plotter-demo.stoatworks-labs.com](https://plotter-demo.stoatworks-labs.com/). It's a port to
   a web page, not the plugin: the shaders run in WebGL2 and the tracer, the planner, the
