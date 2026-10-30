@@ -29,11 +29,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # macos-14 and never macos-13: the Intel macOS runners are retired,
+          # macos-15 and never macos-13: the Intel macOS runners are retired,
           # so x86_64 is cross-compiled from Apple Silicon rather than built
           # natively. CMAKE_OSX_ARCHITECTURES in CMakeLists.txt does that on
           # its own; there is nothing to set here.
-          - { name: macos-universal, os: macos-14,       artifact: Plotter.bundle }
+          - { name: macos-universal, os: macos-15,       artifact: Plotter.bundle }
           - { name: windows-x86_64,  os: windows-latest, artifact: Plotter.dll }
     steps:
       - uses: actions/checkout@v7
