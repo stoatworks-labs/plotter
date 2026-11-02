@@ -1,5 +1,7 @@
 #include "PassBuffer.h"
 
+#include <ffglex/FFGLScopedFBOBinding.h>
+
 #include <algorithm>
 #include <cmath>
 #include <utility>
@@ -26,7 +28,7 @@ bool PassBuffer::Ensure( GLsizei requestedWidth, GLsizei requestedHeight, GLint 
 
 	Destroy();
 
-	if( !Initialise( requestedWidth, requestedHeight, format ) )
+	if( !InitialiseColourOnly( requestedWidth, requestedHeight, format ) )
 		return false;
 
 	sampling = requestedSampling;
@@ -116,10 +118,41 @@ void PassBuffer::Swap( PassBuffer& other )
 	std::swap( sampling, other.sampling );
 }
 
+bool PassBuffer::InitialiseColourOnly( GLsizei requestedWidth, GLsizei requestedHeight, GLint format )
+{
+	//FFGLFBO::Initialise() step for step, less GenerateDepthBuffer() and its
+	//attachment. depthBufferID stays 0, so Release() has no renderbuffer to
+	//delete either.
+	width               = requestedWidth;
+	height              = requestedHeight;
+	internalColorFormat = format;
+
+	if( !GenerateFBO() || !GenerateColorTexture() )
+	{
+		Destroy();
+		return false;
+	}
+
+	GLenum status = 0;
+	{
+		ScopedFBOBinding framebufferBinding( fboID, ScopedFBOBinding::RB_REVERT );
+		glFramebufferTexture2D( GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTextureID, 0 );
+		status = glCheckFramebufferStatus( GL_FRAMEBUFFER );
+	}
+
+	if( status != GL_FRAMEBUFFER_COMPLETE )
+	{
+		Destroy();
+		return false;
+	}
+
+	return true;
+}
+
 void PassBuffer::Destroy()
 {
 	//The SDK's Release() leaves this behind. Delete it first, then let the base
-	//class deal with the framebuffer and the depth buffer.
+	//class deal with the framebuffer.
 	if( colorTextureID != 0 )
 	{
 		glDeleteTextures( 1, &colorTextureID );
