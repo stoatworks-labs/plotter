@@ -8,16 +8,44 @@
     <link rel="icon" href="data:," />
     <link rel="stylesheet" href="./vendor/kit.css" />
     <link rel="canonical" href="https://plotter-demo.stoatworks-labs.com/" />
+    <meta name="project-page" content="https://stoatworks-labs.com/software/plotter/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="Stoatworks Labs" />
+    <meta property="og:title" content="Plotter — browser demo | Stoatworks Labs" />
+    <meta property="og:description" content="Try the Plotter FFGL plugin for Resolume in your browser: a pen plotter drawing the clip with a slow pen onto paper the ink stays on. The plugin's own edge, ink and composite shaders ported to WebGL2, with its contour tracer, motion planner and machine ported to JavaScript." />
+    <meta property="og:url" content="https://plotter-demo.stoatworks-labs.com/" />
+    <meta property="og:image" content="https://stoatworks-labs.com/thumbs/plotter.png" />
+    <meta property="og:image:width" content="1280" />
+    <meta property="og:image:height" content="720" />
+    <meta property="og:image:alt" content="Plotter" />
+    <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body>
     <main id="demo">
       <noscript>
+        <h1>Plotter</h1>
+        <p>
+          An FFGL effect that traces the outlines in the current frame and draws
+          them with a slow pen on paper the ink stays on. A trapezoidal motion
+          planner with a speed limit, an acceleration limit and a stop at sharp
+          corners moves the carriage by the time that actually passed, and the
+          renderer lays down ink per unit of time, so the line is heavy where
+          the pen is slow, every pen-down is a blot, a coarse step pitch draws
+          staircases, and a carousel of pens costs a trip for every colour
+          change. A few strokes in, the clip has moved on, so the sheet ends up
+          a collage of moments.
+        </p>
         <p>
           This demo runs the plugin's shaders in your browser, so it needs
           JavaScript and WebGL2. The plugin itself, its source and its downloads
           are on
           <a href="https://github.com/stoatworks-labs/plotter">its repository</a>.
         </p>
+        <ul>
+          <li><a href="https://stoatworks-labs.com/software/plotter/">Project page and downloads</a></li>
+          <li><a href="https://stoatworks-labs.com/software/plotter/guide/">User guide</a></li>
+          <li><a href="https://github.com/stoatworks-labs/plotter">Source on GitHub</a></li>
+        </ul>
       </noscript>
     </main>
 
